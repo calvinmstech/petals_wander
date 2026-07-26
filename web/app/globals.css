@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #2e4257;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* Fonts (loaded via next/font in app/layout.tsx) */
+  --font-sans: var(--font-mulish), system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  --font-serif: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo,
+    monospace;
+
+  /* Brand — dusty blue, tuned to the "Flower Shop Wireframes" palette.
+     brand-600 (#5a86a8) is the primary / CTA colour; brand-900 (#2e4257)
+     is body text and the admin top-bar. */
+  --color-brand-50: #f4f7f9;
+  --color-brand-100: #e7eef4;
+  --color-brand-200: #d3dae1;
+  --color-brand-300: #b3cadd;
+  --color-brand-400: #93a5b4;
+  --color-brand-500: #7d9fbc;
+  --color-brand-600: #5a86a8;
+  --color-brand-700: #33597a;
+  --color-brand-800: #3c5266;
+  --color-brand-900: #2e4257;
+
+  /* Soft neutral fills used across cards/inputs */
+  --color-mist: #f4f7f9;
+  --color-haze: #eef3f7;
+}
+
+html {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+/* Shared form field — used across checkout, admin forms and auth. */
+.input {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid #cdd6de;
+  background: #fff;
+  padding: 0.625rem 0.8rem;
+  font-size: 0.875rem;
+  color: #2e4257;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.input::placeholder {
+  color: #9aabb9;
+}
+.input:focus {
+  border-color: #5a86a8;
+}
+
+/* Cart badge "bump" — fires when an item is added to the cart. */
+@keyframes cart-bump {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.28); }
+  55% { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+.cart-bump {
+  animation: cart-bump 0.45s ease;
+}
+
+/* "Added to cart" toast that flies up + fades. */
+@keyframes fly-up {
+  0% { opacity: 0; transform: translateY(8px) scale(0.96); }
+  15% { opacity: 1; transform: translateY(0) scale(1); }
+  80% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-10px) scale(1); }
+}
+.fly-up {
+  animation: fly-up 1.6s ease forwards;
+}
+
+/* Brief pop on the Add-to-cart button itself. */
+@keyframes btn-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+.btn-pop {
+  animation: btn-pop 0.3s ease;
+}
+
+/* Storefront announcement marquee — scrolls its content right-to-left. The
+   track holds two copies of the text so the loop is seamless. */
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: inline-flex;
+  flex-shrink: 0;
+  animation: marquee-scroll 22s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}

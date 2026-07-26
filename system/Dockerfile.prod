@@ -1,0 +1,44 @@
+# ── Production image for the Laravel API ─────────────────────────────────────
+# Same base as the dev image, but dependencies are baked in (no runtime composer
+# install, no bind mount) and the entrypoint runs migrations WITHOUT re-seeding.
+
+FROM composer:2 AS composer-bin
+
+FROM php:8.2-apache
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        zip unzip git \
+        libpng-dev libjpeg-dev libzip-dev libfreetype6-dev libpq-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j"$(nproc)" gd zip pdo pdo_pgsql pgsql \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer-bin /usr/bin/composer /usr/local/bin/composer
+
+RUN a2enmod rewrite
+COPY apache2/sites-available/laravel.conf /etc/apache2/sites-available/laravel.conf
+COPY php/local.ini /usr/local/etc/php/conf.d/local.ini
+RUN a2ensite laravel.conf && a2dissite 000-default.conf
+
+WORKDIR /var/www/html
+
+# Install PHP dependencies first (better layer caching), production-only.
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-progress --no-interaction
+
+# App source. `.dockerignore` keeps .env, vendor, node_modules and caches out so
+# the image never ships a stale .env that would shadow the container environment.
+COPY . .
+
+RUN composer dump-autoload --optimize --no-dev \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
+
+COPY entrypoint.prod.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+EXPOSE 80
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["apache2-foreground"]

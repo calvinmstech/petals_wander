@@ -1,0 +1,17 @@
+# Single front door for the whole app. SITE_ADDRESS comes from the environment:
+#   - ":80"            -> plain HTTP on the raw IP (first deploy, no DNS yet)
+#   - "petalswander.com" -> automatic HTTPS via Let's Encrypt (needs DNS -> this IP)
+{$SITE_ADDRESS} {
+	encode gzip
+
+	# Laravel API and Laravel-served uploads live on the same origin.
+	@backend path /api/* /storage/*
+	handle @backend {
+		reverse_proxy system:80
+	}
+
+	# Everything else is the Next.js storefront + admin.
+	handle {
+		reverse_proxy web:3000
+	}
+}

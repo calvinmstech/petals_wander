@@ -1,0 +1,114 @@
+services:
+  # ── PostgreSQL ────────────────────────────────────────────────────────────
+  db:
+    image: postgres:16
+    container_name: flowershop-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-flowershop}
+      POSTGRES_USER: ${POSTGRES_USER:-flowershop}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT:-8016}:5432"
+    networks:
+      - flowershop
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-flowershop} -d ${POSTGRES_DB:-flowershop}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── system: Laravel API ───────────────────────────────────────────────────
+  system:
+    build:
+      context: ./system
+      dockerfile: Dockerfile
+    image: flowershop-system
+    container_name: flowershop-system
+    restart: unless-stopped
+    working_dir: /var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: ${POSTGRES_DB:-flowershop}
+      DB_USERNAME: ${POSTGRES_USER:-flowershop}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-secret}
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      MAIL_USERNAME: ""
+      MAIL_PASSWORD: ""
+      MAIL_SCHEME: ""
+      MAIL_FROM_ADDRESS: hello@petalwanders.test
+      MAIL_FROM_NAME: Petals Wander
+      # Optional: enables live courier distance pricing (falls back to a default km when empty).
+      GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
+    volumes:
+      - ./system:/var/www/html
+    ports:
+      - "${SYSTEM_PORT:-8014}:80"
+    networks:
+      - flowershop
+
+  # ── web: Next.js storefront + admin ───────────────────────────────────────
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    image: flowershop-web
+    container_name: flowershop-web
+    restart: unless-stopped
+    working_dir: /app
+    depends_on:
+      - system
+    environment:
+      # Browser-side calls hit the host-published API port
+      NEXT_PUBLIC_API_BASE: http://localhost:${SYSTEM_PORT:-8014}/api
+      # Server-side (route handlers / RSC) calls stay on the docker network
+      API_BASE_INTERNAL: http://system/api
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    ports:
+      - "${WEB_PORT:-8015}:3000"
+    networks:
+      - flowershop
+
+  # ── mailpit: catches outgoing email (dev) ─────────────────────────────────
+  mailpit:
+    image: axllent/mailpit
+    container_name: flowershop-mailpit
+    restart: unless-stopped
+    ports:
+      - "${MAILPIT_UI_PORT:-8025}:8025" # web UI
+    networks:
+      - flowershop
+
+  # ── adminer: lightweight DB UI ────────────────────────────────────────────
+  adminer:
+    image: adminer
+    container_name: flowershop-adminer
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    ports:
+      - "${ADMINER_PORT:-8017}:8080"
+    networks:
+      - flowershop
+
+volumes:
+  db-data:
+
+networks:
+  flowershop:
+    driver: bridge

@@ -1,0 +1,884 @@
+openapi: 3.0.3
+info:
+  title: 'Petal Wanders API API Documentation'
+  description: 'REST API for the Flower Shop platform. Powers both the storefront and the admin backend. Authentication uses Bearer tokens (Laravel Sanctum); admin endpoints additionally require the `admin` role.'
+  version: 1.0.0
+servers:
+  -
+    url: 'http://localhost:8014'
+tags:
+  -
+    name: 'Admin · Categories'
+    description: "\nCategory management. Requires an authenticated user with the `admin` role."
+  -
+    name: 'Admin · Orders'
+    description: "\nOrder oversight and fulfilment. Requires the `admin` role."
+  -
+    name: 'Admin · Products'
+    description: "\nCatalog management. Requires an authenticated user with the `admin` role."
+  -
+    name: Authentication
+    description: "\nRegister, log in, and manage the current session. Login returns a Bearer\ntoken (Laravel Sanctum) plus the user's roles. Storefront and admin share\nthis endpoint — authorization is decided by role."
+  -
+    name: Catalog
+    description: "\nPublic, read-only catalog endpoints consumed by the storefront."
+  -
+    name: Endpoints
+    description: ''
+  -
+    name: Orders
+    description: "\nCustomer order endpoints. Requires authentication; users only see their own orders."
+components:
+  securitySchemes:
+    default:
+      type: http
+      scheme: bearer
+      description: 'Obtain a token from <code>POST /api/auth/login</code>, then send it as <code>Authorization: Bearer {token}</code>.'
+security:
+  -
+    default: []
+paths:
+  /api/admin/categories:
+    get:
+      summary: 'List categories (admin)'
+      operationId: listCategoriesadmin
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Admin · Categories'
+    post:
+      summary: 'Create category'
+      operationId: createCategory
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Admin · Categories'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: ''
+                  example: Wedding
+                description:
+                  type: string
+                  description: ''
+                  example: 'Arrangements for weddings.'
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: true
+              required:
+                - name
+  '/api/admin/categories/{id}':
+    get:
+      summary: 'Show category (admin)'
+      operationId: showCategoryadmin
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Admin · Categories'
+    put:
+      summary: 'Update category'
+      operationId: updateCategory
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Admin · Categories'
+    delete:
+      summary: 'Delete category'
+      operationId: deleteCategory
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Admin · Categories'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the category.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: category
+        description: ''
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/admin/orders:
+    get:
+      summary: 'List all orders'
+      operationId: listAllOrders
+      description: ''
+      parameters:
+        -
+          in: query
+          name: status
+          description: 'Filter by status.'
+          example: pending
+          required: false
+          schema:
+            type: string
+            description: 'Filter by status.'
+            example: pending
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Admin · Orders'
+  '/api/admin/orders/{order_id}':
+    get:
+      summary: 'Show order (admin)'
+      operationId: showOrderadmin
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Admin · Orders'
+    patch:
+      summary: 'Update order status'
+      operationId: updateOrderStatus
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Admin · Orders'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  description: 'One of pending, paid, shipped, completed, cancelled.'
+                  example: shipped
+              required:
+                - status
+    parameters:
+      -
+        in: path
+        name: order_id
+        description: 'The ID of the order.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: order
+        description: ''
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/admin/dashboard:
+    get:
+      summary: 'Dashboard metrics'
+      operationId: dashboardMetrics
+      description: 'Summary counters for the admin landing page.'
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Admin · Orders'
+  /api/admin/products:
+    get:
+      summary: 'List products (admin)'
+      operationId: listProductsadmin
+      description: 'Includes inactive products. Supports `search`.'
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Admin · Products'
+    post:
+      summary: 'Create product'
+      operationId: createProduct
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Admin · Products'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: ''
+                  example: 'Sunflower Bundle'
+                category_id:
+                  type: integer
+                  description: ''
+                  example: 1
+                description:
+                  type: string
+                  description: ''
+                  example: 'A cheerful bundle of sunflowers.'
+                price:
+                  type: number
+                  description: ''
+                  example: 79.9
+                stock:
+                  type: integer
+                  description: ''
+                  example: 25
+                image_path:
+                  type: string
+                  description: ''
+                  example: 'https://example.com/sunflower.jpg'
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: true
+                is_featured:
+                  type: boolean
+                  description: ''
+                  example: false
+              required:
+                - name
+                - price
+                - stock
+  '/api/admin/products/{id}':
+    get:
+      summary: 'Show product (admin)'
+      operationId: showProductadmin
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - 'Admin · Products'
+    put:
+      summary: 'Update product'
+      operationId: updateProduct
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Admin · Products'
+    delete:
+      summary: 'Delete product'
+      operationId: deleteProduct
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - 'Admin · Products'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the product.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: product
+        description: ''
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/auth/register:
+    post:
+      summary: Register
+      operationId: register
+      description: 'Create a new customer account and return an API token.'
+      parameters: []
+      responses: {  }
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: "The user's full name."
+                  example: 'Jane Doe'
+                email:
+                  type: string
+                  description: 'Unique email.'
+                  example: jane@example.com
+                password:
+                  type: string
+                  description: 'Min 8 chars.'
+                  example: password123
+              required:
+                - name
+                - email
+                - password
+      security: []
+  /api/auth/login:
+    post:
+      summary: Login
+      operationId: login
+      description: 'Authenticate with email + password. Works for both customers and admins.'
+      parameters: []
+      responses: {  }
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: ''
+                  example: admin@flowershop.test
+                password:
+                  type: string
+                  description: ''
+                  example: password
+              required:
+                - email
+                - password
+      security: []
+  /api/auth/me:
+    get:
+      summary: 'Current user'
+      operationId: currentUser
+      description: 'Return the authenticated user and their roles.'
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Authentication
+      security: []
+  /api/auth/logout:
+    post:
+      summary: Logout
+      operationId: logout
+      description: 'Revoke the token used for the current request.'
+      parameters: []
+      responses: {  }
+      tags:
+        - Authentication
+      security: []
+  /api/categories:
+    get:
+      summary: 'List categories'
+      operationId: listCategories
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      name: Bouquets
+                      slug: bouquets
+                      description: 'Hand-tied bouquets for every occasion.'
+                    -
+                      id: 4
+                      name: Occasions
+                      slug: occasions
+                      description: 'Birthday, anniversary and sympathy arrangements.'
+                    -
+                      id: 3
+                      name: Plants
+                      slug: plants
+                      description: 'Potted plants and succulents.'
+                    -
+                      id: 2
+                      name: Roses
+                      slug: roses
+                      description: 'Classic and premium roses.'
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        name: Bouquets
+                        slug: bouquets
+                        description: 'Hand-tied bouquets for every occasion.'
+                      -
+                        id: 4
+                        name: Occasions
+                        slug: occasions
+                        description: 'Birthday, anniversary and sympathy arrangements.'
+                      -
+                        id: 3
+                        name: Plants
+                        slug: plants
+                        description: 'Potted plants and succulents.'
+                      -
+                        id: 2
+                        name: Roses
+                        slug: roses
+                        description: 'Classic and premium roses.'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        name:
+                          type: string
+                          example: Bouquets
+                        slug:
+                          type: string
+                          example: bouquets
+                        description:
+                          type: string
+                          example: 'Hand-tied bouquets for every occasion.'
+      tags:
+        - Catalog
+      security: []
+  /api/products:
+    get:
+      summary: 'List products'
+      operationId: listProducts
+      description: 'Returns active products. Supports filtering and pagination.'
+      parameters:
+        -
+          in: query
+          name: category
+          description: 'Filter by category slug.'
+          example: bouquets
+          required: false
+          schema:
+            type: string
+            description: 'Filter by category slug.'
+            example: bouquets
+        -
+          in: query
+          name: featured
+          description: 'Only featured products.'
+          example: true
+          required: false
+          schema:
+            type: boolean
+            description: 'Only featured products.'
+            example: true
+        -
+          in: query
+          name: search
+          description: 'Match against the product name.'
+          example: rose
+          required: false
+          schema:
+            type: string
+            description: 'Match against the product name.'
+            example: rose
+        -
+          in: query
+          name: per_page
+          description: 'Items per page (default 12).'
+          example: 12
+          required: false
+          schema:
+            type: integer
+            description: 'Items per page (default 12).'
+            example: 12
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  current_page: 1
+                  data: []
+                  first_page_url: 'http://localhost:8014/api/products?page=1'
+                  from: null
+                  last_page: 1
+                  last_page_url: 'http://localhost:8014/api/products?page=1'
+                  links:
+                    -
+                      url: null
+                      label: '&laquo; Previous'
+                      active: false
+                    -
+                      url: 'http://localhost:8014/api/products?page=1'
+                      label: '1'
+                      active: true
+                    -
+                      url: null
+                      label: 'Next &raquo;'
+                      active: false
+                  next_page_url: null
+                  path: 'http://localhost:8014/api/products'
+                  per_page: 12
+                  prev_page_url: null
+                  to: null
+                  total: 0
+                properties:
+                  current_page:
+                    type: integer
+                    example: 1
+                  data:
+                    type: array
+                    example: []
+                  first_page_url:
+                    type: string
+                    example: 'http://localhost:8014/api/products?page=1'
+                  from:
+                    type: string
+                    example: null
+                    nullable: true
+                  last_page:
+                    type: integer
+                    example: 1
+                  last_page_url:
+                    type: string
+                    example: 'http://localhost:8014/api/products?page=1'
+                  links:
+                    type: array
+                    example:
+                      -
+                        url: null
+                        label: '&laquo; Previous'
+                        active: false
+                      -
+                        url: 'http://localhost:8014/api/products?page=1'
+                        label: '1'
+                        active: true
+                      -
+                        url: null
+                        label: 'Next &raquo;'
+                        active: false
+                    items:
+                      type: object
+                      properties:
+                        url:
+                          type: string
+                          example: null
+                          nullable: true
+                        label:
+                          type: string
+                          example: '&laquo; Previous'
+                        active:
+                          type: boolean
+                          example: false
+                  next_page_url:
+                    type: string
+                    example: null
+                    nullable: true
+                  path:
+                    type: string
+                    example: 'http://localhost:8014/api/products'
+                  per_page:
+                    type: integer
+                    example: 12
+                  prev_page_url:
+                    type: string
+                    example: null
+                    nullable: true
+                  to:
+                    type: string
+                    example: null
+                    nullable: true
+                  total:
+                    type: integer
+                    example: 0
+      tags:
+        - Catalog
+      security: []
+  '/api/products/{product_slug}':
+    get:
+      summary: 'Show product'
+      operationId: showProduct
+      description: 'Fetch a single active product by its slug.'
+      parameters: []
+      responses:
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'No query results for model [App\Models\Product] 1'
+                properties:
+                  message:
+                    type: string
+                    example: 'No query results for model [App\Models\Product] 1'
+      tags:
+        - Catalog
+      security: []
+    parameters:
+      -
+        in: path
+        name: product_slug
+        description: 'The slug of the product.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: product
+        description: 'The product slug.'
+        example: red-rose-bouquet
+        required: true
+        schema:
+          type: string
+  /api/health:
+    get:
+      summary: ''
+      operationId: getApiHealth
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: ok
+                  service: flower-shop-api
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  service:
+                    type: string
+                    example: flower-shop-api
+      tags:
+        - Endpoints
+      security: []
+  /api/orders:
+    get:
+      summary: 'List my orders'
+      operationId: listMyOrders
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Orders
+    post:
+      summary: 'Place an order'
+      operationId: placeAnOrder
+      description: "Creates an order from a list of product/quantity pairs. Prices and stock\nare validated server-side; the request only supplies product ids + quantities."
+      parameters: []
+      responses: {  }
+      tags:
+        - Orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  type: array
+                  description: 'Line items.'
+                  example:
+                    -
+                      product_id: 1
+                      quantity: 2
+                  items:
+                    type: object
+                    properties:
+                      product_id:
+                        type: integer
+                        description: ''
+                        example: 1
+                      quantity:
+                        type: integer
+                        description: ''
+                        example: 2
+                    required:
+                      - product_id
+                      - quantity
+                recipient_name:
+                  type: string
+                  description: ''
+                  example: 'Jane Doe'
+                phone:
+                  type: string
+                  description: ''
+                  example: '+60123456789'
+                  nullable: true
+                shipping_address:
+                  type: string
+                  description: ''
+                  example: '12 Jalan Bunga, 50000 KL'
+                notes:
+                  type: string
+                  description: ''
+                  example: 'Please deliver before noon.'
+                  nullable: true
+              required:
+                - items
+                - recipient_name
+                - shipping_address
+  '/api/orders/{order_id}':
+    get:
+      summary: 'Show my order'
+      operationId: showMyOrder
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Orders
+    parameters:
+      -
+        in: path
+        name: order_id
+        description: 'The ID of the order.'
+        example: 17
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: order
+        description: ''
+        example: 1
+        required: true
+        schema:
+          type: integer

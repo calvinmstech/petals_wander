@@ -1,0 +1,216 @@
+name: Authentication
+description: |-
+
+  Register, log in, and manage the current session. Login returns a Bearer
+  token (Laravel Sanctum) plus the user's roles. Storefront and admin share
+  this endpoint — authorization is decided by role.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/auth/register
+    metadata:
+      custom: []
+      groupName: Authentication
+      groupDescription: |-
+
+        Register, log in, and manage the current session. Login returns a Bearer
+        token (Laravel Sanctum) plus the user's roles. Storefront and admin share
+        this endpoint — authorization is decided by role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: Register
+      description: 'Create a new customer account and return an API token.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      name:
+        custom: []
+        name: name
+        description: "The user's full name."
+        required: true
+        example: 'Jane Doe'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'Unique email.'
+        required: true
+        example: jane@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      password:
+        custom: []
+        name: password
+        description: 'Min 8 chars.'
+        required: true
+        example: password123
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      name: 'Jane Doe'
+      email: jane@example.com
+      password: password123
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/auth/login
+    metadata:
+      custom: []
+      groupName: Authentication
+      groupDescription: |-
+
+        Register, log in, and manage the current session. Login returns a Bearer
+        token (Laravel Sanctum) plus the user's roles. Storefront and admin share
+        this endpoint — authorization is decided by role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: Login
+      description: 'Authenticate with email + password. Works for both customers and admins.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        custom: []
+        name: email
+        description: ''
+        required: true
+        example: admin@flowershop.test
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      password:
+        custom: []
+        name: password
+        description: ''
+        required: true
+        example: password
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      email: admin@flowershop.test
+      password: password
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/auth/me
+    metadata:
+      custom: []
+      groupName: Authentication
+      groupDescription: |-
+
+        Register, log in, and manage the current session. Login returns a Bearer
+        token (Laravel Sanctum) plus the user's roles. Storefront and admin share
+        this endpoint — authorization is decided by role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Current user'
+      description: 'Return the authenticated user and their roles.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Unauthenticated."}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/auth/logout
+    metadata:
+      custom: []
+      groupName: Authentication
+      groupDescription: |-
+
+        Register, log in, and manage the current session. Login returns a Bearer
+        token (Laravel Sanctum) plus the user's roles. Storefront and admin share
+        this endpoint — authorization is decided by role.
+      subgroup: ''
+      subgroupDescription: ''
+      title: Logout
+      description: 'Revoke the token used for the current request.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null

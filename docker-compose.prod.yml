@@ -1,0 +1,112 @@
+# ── Production stack ─────────────────────────────────────────────────────────
+# One Caddy front door terminates HTTP/HTTPS and routes on the same origin:
+#   /api/*      -> system (Laravel)
+#   /storage/*  -> system (uploaded receipts / images)
+#   everything  -> web (Next.js)
+# Nothing but Caddy publishes a port. Values come from a root .env file
+# (copy .env.production.example -> .env and fill it in).
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - flowershop
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  system:
+    build:
+      context: ./system
+      dockerfile: Dockerfile.prod
+    image: flowershop-system-prod
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_NAME: ${APP_NAME:-Petals Wander}
+      APP_ENV: production
+      APP_KEY: ${APP_KEY}
+      APP_DEBUG: "false"
+      APP_URL: ${APP_URL}
+      APP_TIMEZONE: ${APP_TIMEZONE:-UTC}
+      LOG_CHANNEL: stack
+      LOG_LEVEL: warning
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: ${POSTGRES_DB}
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      SESSION_DRIVER: database
+      QUEUE_CONNECTION: database
+      CACHE_STORE: database
+      # Email is log-only until real SMTP is configured (orders tolerate this).
+      MAIL_MAILER: ${MAIL_MAILER:-log}
+      MAIL_HOST: ${MAIL_HOST:-}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_SCHEME: ${MAIL_SCHEME:-}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-hello@petalwanders.test}
+      MAIL_FROM_NAME: ${APP_NAME:-Petals Wander}
+      FRONTEND_URL: ${APP_URL}
+      SANCTUM_STATEFUL_DOMAINS: ${APP_DOMAIN:-}
+      GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
+      SCRIBE_AUTH_KEY: ${SCRIBE_AUTH_KEY:-}
+    volumes:
+      # Persist uploaded receipts/images + logs across image rebuilds.
+      - system-storage:/var/www/html/storage
+    networks:
+      - flowershop
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile.prod
+    image: flowershop-web-prod
+    restart: unless-stopped
+    depends_on:
+      - system
+    networks:
+      - flowershop
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - web
+      - system
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      # ":80" = plain HTTP on the raw IP (first deploy). Set this to your
+      # domain (e.g. petalswander.com) to switch on automatic HTTPS.
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - flowershop
+
+volumes:
+  db-data:
+  system-storage:
+  caddy-data:
+  caddy-config:
+
+networks:
+  flowershop:
+    driver: bridge

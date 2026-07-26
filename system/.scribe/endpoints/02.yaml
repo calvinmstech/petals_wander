@@ -1,0 +1,208 @@
+name: Catalog
+description: |-
+
+  Public, read-only catalog endpoints consumed by the storefront.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/categories
+    metadata:
+      custom: []
+      groupName: Catalog
+      groupDescription: |-
+
+        Public, read-only catalog endpoints consumed by the storefront.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List categories'
+      description: ''
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      home:
+        custom: []
+        name: home
+        description: 'Only categories flagged to show on the home page.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      home: true
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":[{"id":1,"name":"Bouquets","slug":"bouquets","description":"Hand-tied bouquets for every occasion.","image_path":"\/images\/products\/hydrangea-bouquet.svg","show_on_home":true},{"id":4,"name":"Occasions","slug":"occasions","description":"Birthday, anniversary and sympathy arrangements.","image_path":"\/images\/products\/serene-white-lilies.svg","show_on_home":true},{"id":3,"name":"Plants","slug":"plants","description":"Potted plants and succulents.","image_path":"\/images\/products\/eucalyptus-blooms.svg","show_on_home":true},{"id":2,"name":"Roses","slug":"roses","description":"Classic and premium roses.","image_path":"\/images\/products\/white-rose-elegance.svg","show_on_home":true}]}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/products
+    metadata:
+      custom: []
+      groupName: Catalog
+      groupDescription: |-
+
+        Public, read-only product endpoints consumed by the storefront.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'List products'
+      description: 'Returns active products. Supports filtering and pagination.'
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      category:
+        custom: []
+        name: category
+        description: 'Filter by category slug.'
+        required: false
+        example: bouquets
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      featured:
+        custom: []
+        name: featured
+        description: 'Only featured products.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      search:
+        custom: []
+        name: search
+        description: 'Match against the product name.'
+        required: false
+        example: rose
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      per_page:
+        custom: []
+        name: per_page
+        description: 'Items per page (default 12).'
+        required: false
+        example: 12
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      category: bouquets
+      featured: true
+      search: rose
+      per_page: 12
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"current_page":1,"data":[],"first_page_url":"http:\/\/localhost:8014\/api\/products?page=1","from":null,"last_page":1,"last_page_url":"http:\/\/localhost:8014\/api\/products?page=1","links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"http:\/\/localhost:8014\/api\/products?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"next_page_url":null,"path":"http:\/\/localhost:8014\/api\/products","per_page":12,"prev_page_url":null,"to":null,"total":0}'
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/products/{product}'
+    metadata:
+      custom: []
+      groupName: Catalog
+      groupDescription: |-
+
+        Public, read-only product endpoints consumed by the storefront.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Show product'
+      description: |-
+        Fetch a single active product by its numeric id or its slug, so the
+        storefront can link to /product/:id while slug URLs keep working.
+      authenticated: false
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      product:
+        custom: []
+        name: product
+        description: 'The product id or slug.'
+        required: true
+        example: red-rose-bouquet
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      product: red-rose-bouquet
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 404
+        content: |-
+          {
+              "message": "No query results for model [App\\Models\\Product]."
+          }
+        headers:
+          cache-control: 'no-cache, private'
+          content-type: application/json
+          vary: Origin
+        description: null
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
