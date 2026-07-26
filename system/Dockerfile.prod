@@ -31,6 +31,12 @@ RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-pr
 # the image never ships a stale .env that would shadow the container environment.
 COPY . .
 
+# Scribe is a dev-only dependency (require-dev), so this --no-dev image doesn't
+# have its classes. config/scribe.php references them at load time, which would
+# crash package:discover / config:cache. Nothing at runtime reads this config
+# (the /docs route only registers when Scribe is installed), so drop it in prod.
+RUN rm -f config/scribe.php
+
 RUN composer dump-autoload --optimize --no-dev \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
